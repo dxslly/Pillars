@@ -21,11 +21,8 @@ namespace EcsRx.Unity.MonoBehaviours
         public string PoolName;
 
         [SerializeField]
-        public List<string> Components = new List<string>();
-
-        [SerializeField]
-        public List<string> ComponentEditorState = new List<string>();
-
+        public SerializableEditorEntity EditorEntity = new SerializableEditorEntity();
+    
         [Inject]
         public void RegisterEntity()
         {
@@ -57,16 +54,7 @@ namespace EcsRx.Unity.MonoBehaviours
 
         private void SetupEntityComponents(IEntity entity)
         {
-            for (var i = 0; i < Components.Count(); i++)
-            {
-                var typeName = Components[i];
-                var type = Type.GetType(typeName);
-                if (type == null) { throw new Exception("Cannot resolve type for [" + typeName + "]"); }
-
-                var component = (IComponent)Activator.CreateInstance(type);
-                var componentProperties = JSON.Parse(ComponentEditorState[i]);
-                component.DeserializeComponent(componentProperties);
-
+            foreach (var component in EditorEntity.Components) {
                 entity.AddComponent(component);
             }
         }
